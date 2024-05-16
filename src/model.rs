@@ -113,7 +113,7 @@ impl Builder {
             .map(|v| v.parse().expect("invalid value for `LOOM_CHECKPOINT_FILE`"))
             .ok();
 
-        Builder {
+        let s = Builder {
             max_threads: DEFAULT_MAX_THREADS,
             max_branches,
             max_duration,
@@ -124,7 +124,10 @@ impl Builder {
             expect_explicit_explore: false,
             location,
             log,
-        }
+        };
+        println!("b: {:?}", &s);
+
+        s
     }
 
     /// Set the checkpoint file.
@@ -149,7 +152,9 @@ impl Builder {
         );
         let mut scheduler = Scheduler::new(self.max_threads);
 
+        // checkpointファイルを読んで,execution pathを設定する
         if let Some(ref path) = self.checkpoint_file {
+            // もしファイルが存在すれば, jsonファイルを読んで, execution pathを設定
             if path.exists() {
                 execution.path = checkpoint::load_execution_path(path);
                 execution.path.set_max_branches(self.max_branches);
@@ -191,8 +196,13 @@ impl Builder {
             let f = f.clone();
 
             scheduler.run(&mut execution, move || {
-                f();
+                let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    f();
+                }));
 
+                if result.is_err() {
+                    panic!("panic detected in iteration {}", i);
+                }
                 let lazy_statics = rt::execution(|execution| execution.lazy_statics.drop());
 
                 // drop outside of execution
