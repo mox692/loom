@@ -74,16 +74,21 @@ impl Scheduler {
         Self::with_state(|state| state.queued_spawn.push_back(QueuedSpawn { stack_size, f }));
     }
 
+    // プログラム1回の実行に相当.
+    // プログラム中のthread生成を扱うために, キューが使われていたり, 実行にはgeneratorが使われている
     pub(crate) fn run<F>(&mut self, execution: &mut Execution, f: F)
     where
         F: FnOnce() + Send + 'static,
     {
         let mut threads = Vec::new();
+        // 1つ目のthreadを起動する
         threads.push(spawn_thread(Box::new(f), None));
         threads[0].resume();
 
         loop {
+            // 全てのthreadが終了しているかどうかをcheck
             if execution.threads.is_complete() {
+                // もう一回resumeしてreturnする
                 for thread in &mut threads {
                     thread.resume();
                     assert!(thread.is_done());
@@ -91,10 +96,13 @@ impl Scheduler {
                 return;
             }
 
+            // 今実行している thread_id, execution_id の取得
             let active = execution.threads.active_id();
 
+            // 現在実行しているthreadをtick (具体的にはresume) する
             let mut queued_spawn = Self::tick(&mut threads[active.as_usize()], execution);
 
+            // spawnされてキューに載せられたスレッドを, 処理していく?
             while let Some(th) = queued_spawn.pop_front() {
                 assert!(threads.len() < self.max_threads);
 
@@ -107,6 +115,7 @@ impl Scheduler {
         }
     }
 
+    // 新しいstateを TLS に入れて, resumeを実施して, queuedSpawnを返す
     fn tick(thread: &mut Thread, execution: &mut Execution) -> VecDeque<QueuedSpawn> {
         let mut queued_spawn = VecDeque::new();
         let state = RefCell::new(State {
@@ -114,7 +123,10 @@ impl Scheduler {
             queued_spawn: &mut queued_spawn,
         });
 
+        // transmute_lt(&state) を tls に入れて 実行
         STATE.set(unsafe { transmute_lt(&state) }, || {
+            // 多分, thread.resume()がtlsを参照するんだと思う.
+            // ぱっと思いついたのは, thread.resumeの中で loom::thread::spawn を呼んだ場合とか？(確かspawnがtlsをいじったはず)
             thread.resume();
         });
         queued_spawn
@@ -132,7 +144,9 @@ impl Scheduler {
     }
 }
 
+// generatorを返す.
 fn spawn_thread(f: Box<dyn FnOnce()>, stack_size: Option<usize>) -> Thread {
+    // generatorに実行させる closure
     let body = move || {
         loop {
             let f: Option<Option<Box<dyn FnOnce()>>> = generator::yield_(());

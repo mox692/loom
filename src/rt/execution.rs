@@ -106,6 +106,7 @@ impl Execution {
 
         let mut threads = self.threads;
 
+        // magic happens here!! pathが色々やってそう
         if !path.step() {
             return None;
         }
@@ -136,6 +137,7 @@ impl Execution {
     pub(crate) fn schedule(&mut self) -> bool {
         use crate::rt::path::Thread;
 
+        // memo: https://users.soe.ucsc.edu/~cormac/papers/popl05.pdf
         // Implementation of the DPOR algorithm.
 
         let curr_thread = self.threads.active_id();

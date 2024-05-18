@@ -5,6 +5,8 @@ use crate::rt::vv::VersionVec;
 use std::{any::Any, collections::HashMap, fmt, ops};
 
 use super::Location;
+
+// スレッドの情報を保持する struct
 pub(crate) struct Thread {
     pub id: Id,
 
@@ -59,6 +61,7 @@ pub(crate) struct Set {
     iteration_span: tracing::Span,
 }
 
+/// Pair of current [`crate::rt::Execution`] ID and the currently executing thread ID.
 #[derive(Eq, PartialEq, Hash, Copy, Clone)]
 pub(crate) struct Id {
     execution_id: execution::Id,
@@ -234,6 +237,7 @@ impl Set {
         self.active.is_some()
     }
 
+    /// Check if all threads are completed or not.
     pub(crate) fn is_complete(&self) -> bool {
         if self.active.is_none() {
             // All threads should be terminated
@@ -247,10 +251,12 @@ impl Set {
 
             true
         } else {
+            // suspendしてるってこと？
             false
         }
     }
 
+    /// Returns the current
     pub(crate) fn active_id(&self) -> Id {
         Id::new(self.execution_id, self.active.unwrap())
     }

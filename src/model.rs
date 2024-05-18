@@ -147,6 +147,8 @@ impl Builder {
             self.preemption_bound,
             !self.expect_explicit_explore,
         );
+
+        // デフォルトは5スレッド
         let mut scheduler = Scheduler::new(self.max_threads);
 
         if let Some(ref path) = self.checkpoint_file {
@@ -163,6 +165,7 @@ impl Builder {
 
         let start = Instant::now();
         loop {
+            // checkpoint関連のもろもろものcheck
             if i % self.checkpoint_interval == 0 {
                 info!(parent: None, "");
                 info!(
@@ -193,6 +196,7 @@ impl Builder {
             scheduler.run(&mut execution, move || {
                 f();
 
+                // TLSにあるデータを消す
                 let lazy_statics = rt::execution(|execution| execution.lazy_statics.drop());
 
                 // drop outside of execution
@@ -209,6 +213,8 @@ impl Builder {
             // execution, as the `Execution` will capture the current span when
             // it's reset.
             _span = tracing::info_span!(parent: None, "iter", message = i).entered();
+
+            // Executionを交換してるっぽい
             if let Some(next) = execution.step() {
                 execution = next;
             } else {

@@ -4,6 +4,9 @@ use crate::rt::{thread, Access, Location, Synchronize, VersionVec};
 use std::sync::atomic::Ordering::{Acquire, Release};
 
 use tracing::trace;
+
+// loom::sync::Mutexを作成すると付与される めたデータ
+// どのtreadがlockを持っているかとか, このMutexへのアクセス情報がある
 #[derive(Debug, Copy, Clone)]
 pub(crate) struct Mutex {
     state: object::Ref<State>,
@@ -41,6 +44,7 @@ impl Mutex {
         })
     }
 
+    // branch pointを作るっぽい
     pub(crate) fn acquire_lock(&self, location: Location) {
         self.state.branch_acquire(self.is_locked(), location);
         assert!(self.post_acquire(), "expected to be able to acquire lock");

@@ -22,6 +22,7 @@ impl<T> Mutex<T> {
     pub fn new(data: T) -> Mutex<T> {
         Mutex {
             data: std::sync::Mutex::new(data),
+            // これ true で大丈夫？
             object: rt::Mutex::new(true),
         }
     }
