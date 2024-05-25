@@ -331,13 +331,16 @@ impl<T> fmt::Debug for Ref<T> {
 impl<T: Object<Entry = Entry>> Ref<T> {
     // TODO: rename `branch_disable`
     pub(super) fn branch_acquire(self, is_locked: bool, location: Location) {
+        // thread localに色々書き込む
         super::branch(|execution| {
             trace!(obj = ?self, ?is_locked, "Object::branch_acquire");
 
+            // Opaque actionを書く
             self.set_action(execution, Action::Opaque, location);
 
             if is_locked {
                 // The mutex is currently blocked, cannot make progress
+                // このthreadはblockされていることを(多分探索から外される？)
                 execution.threads.active_mut().set_blocked(location);
             }
         })

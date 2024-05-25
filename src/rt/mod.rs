@@ -113,13 +113,17 @@ pub(crate) fn park(location: Location) {
     }
 }
 
+// context switchを伴いうる実行を行う
 /// Add an execution branch point.
 fn branch<F, R>(f: F) -> R
 where
     F: FnOnce(&mut Execution) -> R,
 {
     let (ret, switch) = execution(|execution| {
+        // とりあえず closure を実行
         let ret = f(execution);
+
+        // DPORを実施. 実行スレッドのswitchが必要稼働かを結果として受け取る
         let switch = execution.schedule();
 
         trace!(?switch, "branch");
