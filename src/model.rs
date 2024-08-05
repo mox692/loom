@@ -164,6 +164,8 @@ impl Builder {
         let f = Arc::new(f);
 
         let start = Instant::now();
+        // executionとschedulerがmutateされる
+        // TODOS: この1回の実行はどういう単位?
         loop {
             // checkpoint関連のもろもろものcheck
             if i % self.checkpoint_interval == 0 {
@@ -178,6 +180,7 @@ impl Builder {
                     checkpoint::store_execution_path(&execution.path, path);
                 }
 
+                // max_duration, max_permutationsのCHECK
                 if let Some(max_permutations) = self.max_permutations {
                     if i >= max_permutations {
                         return;
@@ -193,7 +196,9 @@ impl Builder {
 
             let f = f.clone();
 
+            // executionとschedulerがmutateされる
             scheduler.run(&mut execution, move || {
+                // user-providedの関数を実行
                 f();
 
                 // TLSにあるデータを消す
