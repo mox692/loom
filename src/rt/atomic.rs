@@ -66,6 +66,7 @@ use std::marker::PhantomData;
 use std::sync::atomic::Ordering;
 use std::u16;
 
+use serde::Serialize;
 use tracing::trace;
 
 #[derive(Debug)]
@@ -74,27 +75,31 @@ pub(crate) struct Atomic<T> {
     _p: PhantomData<fn() -> T>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     /// Where the atomic was created
+    #[serde(skip)]
     created_location: Location,
 
     /// Transitive closure of all atomic loads from the cell.
     loaded_at: VersionVec,
 
     /// Location for the *last* time a thread atomically loaded from the cell.
+    #[serde(skip)]
     loaded_locations: LocationSet,
 
     /// Transitive closure of all **unsynchronized** loads from the cell.
     unsync_loaded_at: VersionVec,
 
     /// Location for the *last* time a thread read **synchronized** from the cell.
+    #[serde(skip)]
     unsync_loaded_locations: LocationSet,
 
     /// Transitive closure of all atomic stores to the cell.
     stored_at: VersionVec,
 
     /// Location for the *last* time a thread atomically stored to the cell.
+    #[serde(skip)]
     stored_locations: LocationSet,
 
     /// Version of the most recent **unsynchronized** mutable access to the
@@ -105,6 +110,7 @@ pub(super) struct State {
     unsync_mut_at: VersionVec,
 
     /// Location for the *last* time a thread `with_mut` from the cell.
+    #[serde(skip)]
     unsync_mut_locations: LocationSet,
 
     /// `true` when in a `with_mut` closure. If this is set, there can be no
@@ -120,13 +126,14 @@ pub(super) struct State {
 
     /// Currently tracked stored values. This is the `MAX_ATOMIC_HISTORY` most
     /// recent stores to the atomic cell in loom execution order.
+    #[serde(skip)]
     stores: [Store; MAX_ATOMIC_HISTORY],
 
     /// The total number of stores to the cell.
     cnt: u16,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize)]
 pub(super) enum Action {
     /// Atomic load
     Load,
@@ -138,7 +145,7 @@ pub(super) enum Action {
     Rmw,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 struct Store {
     /// The stored value. All atomic types can be converted to `u64`.
     value: u64,
@@ -160,7 +167,7 @@ struct Store {
     seq_cst: bool,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 struct FirstSeen([u16; MAX_THREADS]);
 
 /// Implements atomic fence behavior

@@ -1,6 +1,8 @@
+use serde::Serialize;
+
 use crate::rt::VersionVec;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub(crate) struct Access {
     path_id: usize,
     dpor_vv: VersionVec,

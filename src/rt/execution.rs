@@ -5,8 +5,10 @@ use std::collections::HashMap;
 use std::convert::TryInto;
 use std::fmt;
 
+use serde::Serialize;
 use tracing::info;
 
+#[derive(Serialize)]
 pub(crate) struct Execution {
     /// Uniquely identifies an execution
     pub(super) id: Id,
@@ -16,14 +18,17 @@ pub(crate) struct Execution {
 
     pub(crate) threads: thread::Set,
 
+    #[serde(skip)]
     pub(crate) lazy_statics: lazy_static::Set,
 
     /// All loom aware objects part of this execution run.
+    #[serde(skip)]
     pub(super) objects: object::Store,
 
     /// Maps raw allocations to LeakTrack objects
     pub(super) raw_allocations: HashMap<usize, Allocation>,
 
+    #[serde(skip)]
     pub(crate) arc_objs: HashMap<*const (), std::sync::Arc<super::Arc>>,
 
     /// Maximum number of concurrent threads
@@ -38,7 +43,7 @@ pub(crate) struct Execution {
     pub(crate) log: bool,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, Serialize)]
 pub(crate) struct Id(usize);
 
 impl Execution {

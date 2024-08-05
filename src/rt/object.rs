@@ -10,8 +10,8 @@ use tracing::trace;
 use serde::{Deserialize, Serialize};
 
 /// Stores objects
-#[derive(Debug)]
-#[cfg_attr(feature = "checkpoint", derive(Serialize, Deserialize))]
+// #[cfg_attr(feature = "checkpoint", derive(Serialize, Deserialize))]
+#[derive(Debug, Serialize, Deserialize)]
 pub(super) struct Store<T = Entry> {
     /// Stored state for all objects.
     entries: Vec<T>,
@@ -44,15 +44,16 @@ pub(super) struct Ref<T = ()> {
 }
 
 // TODO: mov to separate file
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub(super) struct Operation {
     obj: Ref,
     action: Action,
+    #[serde(skip)]
     location: Location,
 }
 
 // TODO: move to separate file
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize)]
 pub(super) enum Action {
     /// Action on an Arc object
     Arc(rt::arc::Action),
@@ -108,7 +109,7 @@ macro_rules! objects {
 }
 
 objects! {
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     // Many of the common variants of this enum are quite large --- only `Entry`
     // and `Alloc` are significantly smaller than most other variants.
     #[allow(clippy::large_enum_variant)]

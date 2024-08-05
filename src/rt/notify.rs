@@ -3,16 +3,17 @@ use crate::rt::{self, Access, Synchronize, VersionVec};
 
 use std::sync::atomic::Ordering::{Acquire, Release};
 
+use serde::Serialize;
 use tracing::trace;
 
 use super::Location;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Serialize)]
 pub(crate) struct Notify {
     state: object::Ref<State>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     /// If true, spurious notifications are possible
     spurious: bool,

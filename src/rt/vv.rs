@@ -5,8 +5,8 @@ use serde::{Deserialize, Serialize};
 use std::cmp;
 use std::ops;
 
-#[derive(Debug, Copy, Clone, Eq, PartialEq)]
-#[cfg_attr(feature = "checkpoint", derive(Serialize, Deserialize))]
+// #[cfg_attr(feature = "checkpoint", derive(Serialize, Deserialize))]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Serialize, Deserialize)]
 pub(crate) struct VersionVec {
     versions: [u16; MAX_THREADS],
 }

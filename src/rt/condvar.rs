@@ -3,6 +3,7 @@ use crate::rt::{self, thread, Access, Mutex, VersionVec};
 
 use std::collections::VecDeque;
 
+use serde::Serialize;
 use tracing::trace;
 
 use super::Location;
@@ -12,7 +13,7 @@ pub(crate) struct Condvar {
     state: object::Ref<State>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     /// Tracks access to the mutex
     last_access: Option<Access>,

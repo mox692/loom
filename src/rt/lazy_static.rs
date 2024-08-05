@@ -1,16 +1,21 @@
+use serde::Serialize;
+
 use crate::rt::synchronize::Synchronize;
 use std::{any::Any, collections::HashMap};
 
+#[derive(Debug, Serialize)]
 pub(crate) struct Set {
     /// Registered statics.
     statics: Option<HashMap<StaticKeyId, StaticValue>>,
 }
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Eq, Debug, PartialEq, Hash, Copy, Clone, Serialize)]
 pub(crate) struct StaticKeyId(usize);
 
+#[derive(Debug, Serialize)]
 pub(crate) struct StaticValue {
     pub(crate) sync: Synchronize,
+    #[serde(skip)]
     v: Box<dyn Any>,
 }
 

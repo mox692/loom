@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use crate::rt::{thread, VersionVec};
 
 use std::sync::atomic::Ordering::{self, *};
@@ -8,7 +10,7 @@ use std::sync::atomic::Ordering::{self, *};
 /// loads, the thread's causality is updated using the synchronization point's
 /// stored causality. On stores, the synchronization point's causality is
 /// updated with the threads.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize)]
 pub(crate) struct Synchronize {
     happens_before: VersionVec,
 }

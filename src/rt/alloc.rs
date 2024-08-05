@@ -1,17 +1,19 @@
 use crate::rt;
 use crate::rt::{object, Location};
 
+use serde::Serialize;
 use tracing::trace;
 
 /// Tracks an allocation
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(crate) struct Allocation {
     state: object::Ref<State>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     is_dropped: bool,
+    #[serde(skip)]
     allocated: Location,
 }
 

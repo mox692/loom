@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use crate::rt::execution;
 use crate::rt::object::Operation;
 use crate::rt::vv::VersionVec;
@@ -7,6 +9,7 @@ use std::{any::Any, collections::HashMap, fmt, ops};
 use super::Location;
 
 // スレッドの情報を保持する struct
+#[derive(Serialize)]
 pub(crate) struct Thread {
     pub id: Id,
 
@@ -34,13 +37,15 @@ pub(crate) struct Thread {
     /// Number of times the thread yielded
     pub yield_count: usize,
 
+    #[serde(skip)]
     locals: LocalMap,
 
     /// `tracing` span used to associate diagnostics with the current thread.
+    #[serde(skip)]
     span: tracing::Span,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(crate) struct Set {
     /// Unique execution identifier
     execution_id: execution::Id,
@@ -58,11 +63,12 @@ pub(crate) struct Set {
     pub seq_cst_causality: VersionVec,
 
     /// `tracing` span used as the parent for new thread spans.
+    #[serde(skip)]
     iteration_span: tracing::Span,
 }
 
 /// Pair of current [`crate::rt::Execution`] ID and the currently executing thread ID.
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Serialize)]
 pub(crate) struct Id {
     execution_id: execution::Id,
     id: usize,
@@ -76,9 +82,12 @@ impl Id {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize)]
 pub(crate) enum State {
-    Runnable { unparked: bool },
+    Runnable {
+        unparked: bool,
+    },
+    #[serde(skip)]
     Blocked(#[allow(dead_code)] Location),
     Yield,
     Terminated,
@@ -86,7 +95,7 @@ pub(crate) enum State {
 
 type LocalMap = HashMap<LocalKeyId, LocalValue>;
 
-#[derive(Eq, PartialEq, Hash, Copy, Clone)]
+#[derive(Eq, PartialEq, Hash, Copy, Clone, Serialize)]
 struct LocalKeyId(usize);
 
 struct LocalValue(Option<Box<dyn Any>>);

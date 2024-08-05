@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use crate::rt::location::{self, Location, LocationSet};
 use crate::rt::{self, object, thread, VersionVec};
 
@@ -7,9 +9,10 @@ pub(crate) struct Cell {
     state: object::Ref<State>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     /// Where the cell was created
+    #[serde(skip)]
     created_location: Location,
 
     /// Number of threads currently reading the cell
@@ -22,12 +25,14 @@ pub(super) struct State {
     read_access: VersionVec,
 
     /// Location for the *last* time a thread read from the cell.
+    #[serde(skip)]
     read_locations: LocationSet,
 
     /// The last mutable access of `data`.
     write_access: VersionVec,
 
     /// Location for the *last* time a thread wrote to the cell
+    #[serde(skip)]
     write_locations: LocationSet,
 }
 

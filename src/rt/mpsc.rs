@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use crate::rt::{object, Access, Location, Synchronize, VersionVec};
 use std::collections::VecDeque;
 use std::sync::atomic::Ordering::{Acquire, Release};
@@ -7,7 +9,7 @@ pub(crate) struct Channel {
     state: object::Ref<State>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     /// Count of messages in the channel.
     msg_cnt: usize,
@@ -37,11 +39,12 @@ pub(super) struct State {
     /// with the channel state at the point when the received message was sent.
     receiver_synchronize: VecDeque<Synchronize>,
 
+    #[serde(skip)]
     created: Location,
 }
 
 /// Actions performed on the Channel.
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize)]
 pub(super) enum Action {
     /// Send a message
     MsgSend,

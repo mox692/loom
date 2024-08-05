@@ -7,6 +7,7 @@ use scoped_tls::scoped_thread_local;
 use std::cell::RefCell;
 use std::collections::VecDeque;
 
+#[derive(Debug)]
 pub(crate) struct Scheduler {
     max_threads: usize,
 }

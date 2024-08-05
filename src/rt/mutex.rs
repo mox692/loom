@@ -3,6 +3,7 @@ use crate::rt::{thread, Access, Location, Synchronize, VersionVec};
 
 use std::sync::atomic::Ordering::{Acquire, Release};
 
+use serde::Serialize;
 use tracing::trace;
 
 // loom::sync::Mutexを作成すると付与される めたデータ
@@ -12,7 +13,7 @@ pub(crate) struct Mutex {
     state: object::Ref<State>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     /// If the mutex should establish sequential consistency.
     seq_cst: bool,

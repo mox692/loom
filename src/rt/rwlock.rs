@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 use crate::rt::object;
 use crate::rt::{thread, Access, Execution, Location, Synchronize, VersionVec};
 
@@ -9,13 +11,13 @@ pub(crate) struct RwLock {
     state: object::Ref<State>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize)]
 enum Locked {
     Read(HashSet<thread::Id>),
     Write(thread::Id),
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize)]
 pub(super) enum Action {
     /// Read lock
     Read,
@@ -24,7 +26,7 @@ pub(super) enum Action {
     Write,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     /// A single `thread::Id` when Write locked.
     /// A set of `thread::Id` when Read locked.

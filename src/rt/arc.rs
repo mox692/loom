@@ -3,18 +3,20 @@ use crate::rt::{self, Access, Location, Synchronize, VersionVec};
 
 use std::sync::atomic::Ordering::{Acquire, Release, SeqCst};
 
+use serde::Serialize;
 use tracing::trace;
 #[derive(Debug)]
 pub(crate) struct Arc {
     state: object::Ref<State>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub(super) struct State {
     /// Reference count
     ref_cnt: usize,
 
     /// Location where the arc was allocated
+    #[serde(skip)]
     allocated: Location,
 
     /// Causality transfers between threads
@@ -33,7 +35,7 @@ pub(super) struct State {
 ///
 /// Clones are only dependent with inspections. Drops are dependent between each
 /// other.
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize)]
 pub(super) enum Action {
     /// Clone the arc
     RefInc,
@@ -49,7 +51,7 @@ pub(super) enum Action {
 /// Actions which modify the Arc's reference count
 ///
 /// This is used to ascertain dependence for Action::Inspect
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq, Serialize)]
 enum RefModify {
     /// Corresponds to Action::RefInc
     RefInc,
