@@ -5,6 +5,7 @@ use std::sync::atomic::Ordering::{Acquire, Release};
 
 use tracing::trace;
 
+use super::object::Action;
 use super::Location;
 
 #[derive(Debug, Copy, Clone)]
@@ -111,7 +112,7 @@ impl Notify {
             self.state.branch_opaque(location);
         } else {
             // This should become branch_disable
-            self.state.branch_acquire(true, location)
+            self.state.branch_disable(Action::Opaque, true, location)
         }
 
         // Thread was notified
