@@ -263,7 +263,7 @@ where
     Scheduler::with_execution(f)
 }
 
-pub fn thread_done() {
+pub(crate) fn thread_done() {
     let locals = execution(|execution| {
         let thread = execution.threads.active_id();
 
