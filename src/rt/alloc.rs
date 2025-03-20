@@ -80,6 +80,7 @@ impl Drop for Allocation {
 }
 
 impl State {
+    #[inline]
     pub(super) fn check_for_leaks(&self, index: usize) {
         if !self.is_dropped {
             if self.allocated.is_captured() {

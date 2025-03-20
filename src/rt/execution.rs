@@ -91,6 +91,7 @@ impl Execution {
     }
 
     /// Resets the execution state for the next execution run
+    #[inline]
     pub(crate) fn step(self) -> Option<Self> {
         let id = Id::new();
         let max_threads = self.max_threads;
@@ -255,6 +256,7 @@ impl Execution {
     }
 
     /// Panics if any leaks were detected
+    #[inline]
     pub(crate) fn check_for_leaks(&self) {
         self.objects.check_for_leaks();
     }

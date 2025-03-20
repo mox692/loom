@@ -143,6 +143,7 @@ impl Channel {
 }
 
 impl State {
+    #[inline]
     pub(super) fn check_for_leaks(&self, index: usize) {
         if self.msg_cnt != 0 {
             if self.created.is_captured() {

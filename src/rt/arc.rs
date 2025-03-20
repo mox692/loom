@@ -168,6 +168,7 @@ impl Arc {
 }
 
 impl State {
+    #[inline]
     pub(super) fn check_for_leaks(&self, index: usize) {
         if self.ref_cnt != 0 {
             if self.allocated.is_captured() {

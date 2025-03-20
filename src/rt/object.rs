@@ -181,6 +181,7 @@ impl<T> Store<T> {
         self.entries.truncate(target);
     }
 
+    #[inline]
     pub(crate) fn clear(&mut self) {
         self.entries.clear();
     }
@@ -247,6 +248,7 @@ impl Store {
     }
 
     /// Panics if any leaks were detected
+    #[inline]
     pub(crate) fn check_for_leaks(&self) {
         for (index, entry) in self.entries.iter().enumerate() {
             match entry {
