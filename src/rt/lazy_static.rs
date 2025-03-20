@@ -22,6 +22,7 @@ impl Set {
         }
     }
 
+    #[inline]
     pub(crate) fn reset(&mut self) {
         assert!(
             self.statics.is_none(),

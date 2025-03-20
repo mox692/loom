@@ -226,14 +226,17 @@ impl Set {
         Id::new(self.execution_id, id)
     }
 
+    #[inline]
     pub(crate) fn max(&self) -> usize {
         self.threads.capacity()
     }
 
+    #[inline]
     pub(crate) fn is_active(&self) -> bool {
         self.active.is_some()
     }
 
+    #[inline]
     pub(crate) fn is_complete(&self) -> bool {
         if self.active.is_none() {
             // All threads should be terminated
@@ -272,6 +275,7 @@ impl Set {
         self.active = id.map(Id::as_usize);
     }
 
+    #[inline]
     pub(crate) fn active_mut(&mut self) -> &mut Thread {
         &mut self.threads[self.active.unwrap()]
     }
@@ -348,6 +352,7 @@ impl Set {
             .join(&self.threads[self.active.unwrap()].causality);
     }
 
+    #[inline]
     pub(crate) fn clear(&mut self, execution_id: execution::Id) {
         self.iteration_span = tracing::Span::current();
         self.threads.clear();

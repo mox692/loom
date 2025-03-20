@@ -36,6 +36,7 @@ impl Scheduler {
     }
 
     /// Access the execution
+    #[inline]
     pub(crate) fn with_execution<F, R>(f: F) -> R
     where
         F: FnOnce(&mut Execution) -> R,
@@ -74,6 +75,7 @@ impl Scheduler {
         Self::with_state(|state| state.queued_spawn.push_back(QueuedSpawn { stack_size, f }));
     }
 
+    #[inline]
     pub(crate) fn run<F>(&mut self, execution: &mut Execution, f: F)
     where
         F: FnOnce() + Send + 'static,
@@ -120,6 +122,7 @@ impl Scheduler {
         queued_spawn
     }
 
+    #[inline]
     fn with_state<F, R>(f: F) -> R
     where
         F: FnOnce(&mut State<'_>) -> R,
