@@ -226,10 +226,12 @@ impl Set {
         Id::new(self.execution_id, id)
     }
 
+    #[inline]
     pub(crate) fn max(&self) -> usize {
         self.threads.capacity()
     }
 
+    #[inline]
     pub(crate) fn is_active(&self) -> bool {
         self.active.is_some()
     }
@@ -273,6 +275,7 @@ impl Set {
         self.active = id.map(Id::as_usize);
     }
 
+    #[inline]
     pub(crate) fn active_mut(&mut self) -> &mut Thread {
         &mut self.threads[self.active.unwrap()]
     }

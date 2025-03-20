@@ -77,6 +77,7 @@ impl Arc {
         })
     }
 
+    #[inline]
     pub(crate) fn ref_inc(&self, location: Location) {
         self.branch(Action::RefInc, location);
 
@@ -109,6 +110,7 @@ impl Arc {
     }
 
     /// Returns true if the memory should be dropped.
+    #[inline]
     pub(crate) fn ref_dec(&self, location: Location) -> bool {
         self.branch(Action::RefDec, location);
 
@@ -155,6 +157,7 @@ impl Arc {
         })
     }
 
+    #[inline]
     fn branch(&self, action: Action, location: Location) {
         let r = self.state;
         r.branch_action(action, location);

@@ -272,6 +272,7 @@ impl fmt::Debug for Execution {
 }
 
 impl Id {
+    #[inline]
     pub(crate) fn new() -> Id {
         use std::sync::atomic::AtomicUsize;
         use std::sync::atomic::Ordering::Relaxed;

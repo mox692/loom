@@ -114,6 +114,7 @@ pub(crate) fn park(location: Location) {
 }
 
 /// Add an execution branch point.
+#[inline]
 fn branch<F, R>(f: F) -> R
 where
     F: FnOnce(&mut Execution) -> R,
