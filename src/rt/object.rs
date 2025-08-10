@@ -329,20 +329,6 @@ impl<T> fmt::Debug for Ref<T> {
 
 // TODO: These fns shouldn't be on Ref
 impl<T: Object<Entry = Entry>> Ref<T> {
-    // TODO: rename `branch_disable`
-    pub(super) fn branch_acquire(self, is_locked: bool, location: Location) {
-        super::branch(|execution| {
-            trace!(obj = ?self, ?is_locked, "Object::branch_acquire");
-
-            self.set_action(execution, Action::Opaque, location);
-
-            if is_locked {
-                // The mutex is currently blocked, cannot make progress
-                execution.threads.active_mut().set_blocked(location);
-            }
-        })
-    }
-
     pub(super) fn branch_action(
         self,
         action: impl Into<Action> + std::fmt::Debug,
