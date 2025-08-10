@@ -114,6 +114,7 @@ pub(crate) fn park(location: Location) {
 }
 
 /// Add an execution branch point.
+#[inline]
 fn branch<F, R>(f: F) -> R
 where
     F: FnOnce(&mut Execution) -> R,
@@ -256,6 +257,7 @@ pub fn yield_now() {
     }
 }
 
+#[inline]
 pub(crate) fn execution<F, R>(f: F) -> R
 where
     F: FnOnce(&mut Execution) -> R,
@@ -263,6 +265,7 @@ where
     Scheduler::with_execution(f)
 }
 
+#[inline]
 pub fn thread_done() {
     let locals = execution(|execution| {
         let thread = execution.threads.active_id();

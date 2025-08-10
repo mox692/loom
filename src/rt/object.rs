@@ -181,6 +181,7 @@ impl<T> Store<T> {
         self.entries.truncate(target);
     }
 
+    #[inline]
     pub(crate) fn clear(&mut self) {
         self.entries.clear();
     }
@@ -247,6 +248,7 @@ impl Store {
     }
 
     /// Panics if any leaks were detected
+    #[inline]
     pub(crate) fn check_for_leaks(&self) {
         for (index, entry) in self.entries.iter().enumerate() {
             match entry {
@@ -275,6 +277,7 @@ impl<T> Ref<T> {
 
 impl<T: Object> Ref<T> {
     /// Get a reference to the object associated with this reference from the store
+    #[inline]
     pub(super) fn get(self, store: &Store<T::Entry>) -> &T {
         T::get_ref(&store.entries[self.index])
             .expect("[loom internal bug] unexpected object stored at reference")
@@ -282,6 +285,7 @@ impl<T: Object> Ref<T> {
 
     /// Get a mutable reference to the object associated with this reference
     /// from the store
+    #[inline]
     pub(super) fn get_mut(self, store: &mut Store<T::Entry>) -> &mut T {
         T::get_mut(&mut store.entries[self.index])
             .expect("[loom internal bug] unexpected object stored at reference")
@@ -330,6 +334,7 @@ impl<T> fmt::Debug for Ref<T> {
 // TODO: These fns shouldn't be on Ref
 impl<T: Object<Entry = Entry>> Ref<T> {
     // TODO: rename `branch_disable`
+    #[inline]
     pub(super) fn branch_acquire(self, is_locked: bool, location: Location) {
         super::branch(|execution| {
             trace!(obj = ?self, ?is_locked, "Object::branch_acquire");
@@ -343,6 +348,7 @@ impl<T: Object<Entry = Entry>> Ref<T> {
         })
     }
 
+    #[inline]
     pub(super) fn branch_action(
         self,
         action: impl Into<Action> + std::fmt::Debug,
@@ -377,6 +383,7 @@ impl<T: Object<Entry = Entry>> Ref<T> {
         self.branch_action(Action::Opaque, location)
     }
 
+    #[inline]
     fn set_action(self, execution: &mut Execution, action: Action, location: Location) {
         assert!(
             T::get_ref(&execution.objects.entries[self.index]).is_some(),
